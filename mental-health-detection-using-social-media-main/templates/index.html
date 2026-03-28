@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindScan - Emotional Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2e1065 0%, #6d28d9 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6 text-white">
+    <div id="root" class="w-full"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function MindScanApp() {
+            const [text, setText] = useState("");
+            const [prediction, setPrediction] = useState("--");
+            const [confidence, setConfidence] = useState("0%");
+            const [color, setColor] = useState("transparent");
+            const [showResult, setShowResult] = useState(false);
+            const [loading, setLoading] = useState(false);
+
+            const risks = ["Depression", "Anxiety", "Sad"];
+            const showTele = risks.includes(prediction);
+
+            async function analyzeText() {
+                if (!text.trim()) {
+                    alert("Please enter text.");
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    const res = await fetch('/analyze', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text })
+                    });
+
+                    if (!res.ok) {
+                        throw new Error('Failed to analyze text');
+                    }
+
+                    const data = await res.json();
+                    setPrediction(data.prediction || "--");
+                    setConfidence(data.confidence || "0%");
+                    setColor(data.color || "#ffffff");
+                    setShowResult(true);
+                } catch (error) {
+                    alert('Unable to analyze right now. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            function resetForm() {
+                setText("");
+                setPrediction("--");
+                setConfidence("0%");
+                setColor("transparent");
+                setShowResult(false);
+            }
+
+            function downloadPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFontSize(20);
+                doc.text('MindScan Report', 20, 20);
+                doc.setFontSize(10);
+                doc.text(`Date: ${new Date().toLocaleString()}`, 20, 30);
+                doc.text('--------------------------------------------------', 20, 35);
+                doc.text('Input Text:', 20, 45);
+                doc.text(doc.splitTextToSize(text || 'No input provided', 170), 20, 55);
+                doc.text(`Result: ${prediction}`, 20, 100);
+                doc.text(`Confidence: ${confidence}`, 20, 110);
+                doc.save('MindScan_Report.pdf');
+            }
+
+            return (
+                <div className="glass w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl mx-auto">
+                    <div className="flex justify-between items-center mb-10">
+                        <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] font-bold tracking-widest">SYSTEM SECURE</span>
+                        <a href="/logout" className="opacity-50 text-[10px] hover:opacity-100 transition-all font-bold tracking-widest uppercase cursor-pointer">Sign Out</a>
+                    </div>
+
+                    <div className="text-center mb-10">
+                        <h1 className="text-5xl font-extrabold tracking-tighter mb-2">Mind<span className="text-pink-500">Scan</span></h1>
+                        <p className="text-purple-300 opacity-80">Advanced Emotional Pattern Detection</p>
+                    </div>
+
+                    <div className="space-y-6">
+                        <textarea
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            className="w-full h-48 bg-black/20 border border-white/10 rounded-2xl p-6 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all text-white"
+                            placeholder="Paste text here for emotional analysis..."
+                        ></textarea>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={analyzeText}
+                                disabled={loading}
+                                className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 py-4 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {loading ? 'Analyzing...' : 'Analyze Signals'}
+                            </button>
+                            <button onClick={resetForm} className="px-8 bg-white/5 rounded-xl hover:bg-white/10 transition-all">Reset</button>
+                        </div>
+                    </div>
+
+                    {showResult && (
+                        <div className="mt-8 p-6 bg-white/5 rounded-2xl border-l-4" style={{ borderColor: color }}>
+                            <div className="flex justify-between items-start mb-6">
+                                <div>
+                                    <p className="text-[10px] opacity-50 uppercase">Detected Pattern</p>
+                                    <h2 className="text-3xl font-bold">{prediction}</h2>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[10px] opacity-50 uppercase">Confidence</p>
+                                    <h2 className="text-2xl font-mono">{confidence}</h2>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                {showTele && (
+                                    <a href="tel:14416" className="flex-1 bg-red-500/20 text-red-300 border border-red-500/50 py-3 rounded-lg text-center font-bold">Call Tele-MANAS</a>
+                                )}
+                                <button onClick={downloadPDF} className="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-lg font-bold">Download Report</button>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="mt-12 pt-6 border-t border-white/5 text-center">
+                        <p className="text-[9px] text-pink-400 font-bold uppercase tracking-[0.2em] mb-2">Safety Notice</p>
+                        <p className="text-[10px] text-white/40 leading-relaxed px-10">This AI model is for screening purposes. It is not a clinical diagnosis. In case of emergency, contact local medical services immediately.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MindScanApp />);
+    </script>
+</body>
+</html>

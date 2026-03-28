@@ -1,0 +1,104 @@
+/* ===== Background ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== Glass Card ===== */
+.container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    padding: 40px;
+    border-radius: 20px;
+    width: 500px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* ===== Title ===== */
+h1 {
+    margin-bottom: 25px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+/* ===== Textarea ===== */
+textarea {
+    width: 100%;
+    height: 120px;
+    border-radius: 12px;
+    border: none;
+    padding: 15px;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    margin-bottom: 20px;
+}
+
+/* ===== Button ===== */
+button {
+    padding: 12px 30px;
+    border-radius: 25px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    background: #ffcc70;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #ffaa00;
+    transform: scale(1.05);
+}
+
+/* ===== Result Box ===== */
+.result-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    animation: slideUp 0.5s ease-in-out;
+}
+
+/* ===== Emotion Colors ===== */
+.Depression {
+    background-color: #ff4d6d;
+}
+
+.Anxiety {
+    background-color: #ff9f1c;
+}
+
+.Stress {
+    background-color: #ff6f61;
+}
+
+.Happy {
+    background-color: #2ec4b6;
+}
+
+.Neutral {
+    background-color: #adb5bd;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes slideUp {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
